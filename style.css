@@ -1,0 +1,213 @@
+/* ============================================================
+   style.css — Tambahan styling untuk Spotify Dashboard
+   Tailwind CSS menangani sebagian besar layout & warna.
+   File ini hanya untuk komponen yang tidak bisa dicapai Tailwind.
+   ============================================================ */
+
+/* ---- Colour variables for consistency ---- */
+:root {
+  --spotify-green:  #1DB954;
+  --spotify-black:  #121212;
+  --spotify-dark:   #181818;
+  --spotify-card:   #282828;
+  --spotify-hover:  #3E3E3E;
+  --spotify-muted:  #B3B3B3;
+}
+
+/* ---- Base scrollbar (Webkit) ---- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--spotify-dark); }
+::-webkit-scrollbar-thumb { background: var(--spotify-hover); border-radius: 3px; }
+
+/* ---- Body typography ---- */
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   KPI CARD
+   ============================================================ */
+.kpi-card {
+  background-color: var(--spotify-card);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 1rem;           /* rounded-2xl */
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.kpi-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  border-color: rgba(29, 185, 84, 0.35);
+}
+
+.kpi-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--spotify-muted);
+}
+
+.kpi-value {
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+/* ============================================================
+   CHART CARD
+   ============================================================ */
+.chart-card {
+  background-color: var(--spotify-card);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  transition: box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.chart-card:hover {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+}
+
+.chart-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.01em;
+}
+
+/* Chart wrapper: fixed height so charts don't collapse */
+.chart-wrap {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+/* Smaller height for doughnut/radar (better aspect ratio) */
+.chart-wrap--sm {
+  height: 280px;
+}
+
+/* Canvas fills the wrapper */
+.chart-wrap canvas,
+.chart-wrap--sm canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ============================================================
+   FILTER SELECT
+   ============================================================ */
+.filter-select {
+  background-color: var(--spotify-hover);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23B3B3B3' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2rem;
+}
+
+.filter-select:focus {
+  border-color: var(--spotify-green);
+  background-color: var(--spotify-card);
+}
+
+.filter-select option {
+  background-color: var(--spotify-card);
+}
+
+/* ============================================================
+   TEMPO RANGE SLIDER
+   ============================================================ */
+.tempo-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: var(--spotify-hover);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.tempo-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--spotify-green);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.tempo-range::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
+}
+
+.tempo-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--spotify-green);
+  cursor: pointer;
+  border: none;
+}
+
+/* ============================================================
+   RESPONSIVE TWEAKS
+   ============================================================ */
+@media (max-width: 640px) {
+  .kpi-value { font-size: 1.4rem; }
+  .chart-wrap { height: 240px; }
+  .chart-wrap--sm { height: 220px; }
+}
+
+/* ============================================================
+   LOADING SKELETON (shown until data loads)
+   ============================================================ */
+.skeleton {
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  background: linear-gradient(90deg, var(--spotify-card) 25%, var(--spotify-hover) 50%, var(--spotify-card) 75%);
+  background-size: 200% 100%;
+  border-radius: 0.5rem;
+}
+
+@keyframes skeleton-pulse {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ============================================================
+   TOOLTIP OVERRIDE (Chart.js)
+   ============================================================ */
+/* Chart.js generates a canvas tooltip; these rules target the
+   external HTML tooltip if ever switched to mode:'html'. */
+.chartjs-tooltip {
+  background: var(--spotify-card) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: 8px !important;
+  color: #fff !important;
+  font-size: 0.75rem !important;
+  padding: 8px 12px !important;
+}

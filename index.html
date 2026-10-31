@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spotify Top 2018 — Music Analytics Dashboard</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Tailwind dark-mode config via CDN -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            spotify: {
+              green:  '#1DB954',
+              black:  '#121212',
+              dark:   '#181818',
+              card:   '#282828',
+              hover:  '#3E3E3E',
+              muted:  '#B3B3B3',
+              light:  '#FFFFFF',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="dark bg-spotify-black text-white min-h-screen">
+
+  <!-- ===== HEADER ===== -->
+  <header class="bg-spotify-dark border-b border-white/10 sticky top-0 z-50">
+    <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center gap-3">
+      <!-- Spotify-style logo mark -->
+      <span class="text-spotify-green text-3xl">&#9835;</span>
+      <div>
+        <h1 class="text-xl sm:text-2xl font-bold tracking-tight leading-none">
+          Spotify Top 2018
+        </h1>
+        <p class="text-xs text-spotify-muted mt-0.5">Music Analytics Dashboard</p>
+      </div>
+      <!-- Song count badge (updated dynamically) -->
+      <span id="badge-count"
+            class="ml-auto text-xs font-semibold bg-spotify-green text-black px-3 py-1 rounded-full">
+        100 lagu
+      </span>
+    </div>
+  </header>
+
+  <main class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- ===== FILTER SECTION ===== -->
+    <section aria-label="Filter">
+      <div class="bg-spotify-card rounded-2xl p-5 shadow-lg border border-white/5">
+        <h2 class="text-sm font-semibold text-spotify-muted uppercase tracking-widest mb-4">
+          Filter Data
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+          <!-- Filter: Artist -->
+          <div class="flex flex-col gap-1">
+            <label for="filter-artist" class="text-xs text-spotify-muted font-medium">Artis</label>
+            <select id="filter-artist" class="filter-select">
+              <option value="">Semua Artis</option>
+            </select>
+          </div>
+
+          <!-- Filter: Key -->
+          <div class="flex flex-col gap-1">
+            <label for="filter-key" class="text-xs text-spotify-muted font-medium">Key (Nada Dasar)</label>
+            <select id="filter-key" class="filter-select">
+              <option value="">Semua Key</option>
+              <option value="0">C (0)</option>
+              <option value="1">C# / Db (1)</option>
+              <option value="2">D (2)</option>
+              <option value="3">D# / Eb (3)</option>
+              <option value="4">E (4)</option>
+              <option value="5">F (5)</option>
+              <option value="6">F# / Gb (6)</option>
+              <option value="7">G (7)</option>
+              <option value="8">G# / Ab (8)</option>
+              <option value="9">A (9)</option>
+              <option value="10">A# / Bb (10)</option>
+              <option value="11">B (11)</option>
+            </select>
+          </div>
+
+          <!-- Filter: Mode -->
+          <div class="flex flex-col gap-1">
+            <label for="filter-mode" class="text-xs text-spotify-muted font-medium">Mode</label>
+            <select id="filter-mode" class="filter-select">
+              <option value="">Major & Minor</option>
+              <option value="1">Major</option>
+              <option value="0">Minor</option>
+            </select>
+          </div>
+
+          <!-- Filter: Tempo Range -->
+          <div class="flex flex-col gap-1">
+            <label class="text-xs text-spotify-muted font-medium">
+              Rentang Tempo (BPM):
+              <span id="tempo-label" class="text-white font-semibold">60 – 220</span>
+            </label>
+            <div class="flex items-center gap-2">
+              <input type="range" id="filter-tempo-min" min="60" max="220" value="60"
+                     class="tempo-range flex-1" aria-label="Tempo minimum" />
+              <input type="range" id="filter-tempo-max" min="60" max="220" value="220"
+                     class="tempo-range flex-1" aria-label="Tempo maximum" />
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Reset button -->
+        <div class="mt-4 flex justify-end">
+          <button id="btn-reset"
+                  class="text-xs font-semibold px-4 py-2 rounded-lg bg-spotify-hover hover:bg-white/20 transition-colors duration-200">
+            Reset Filter
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== KPI CARDS ===== -->
+    <section aria-label="KPI Metrics">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        <!-- Total Lagu -->
+        <div class="kpi-card">
+          <p class="kpi-label">Total Lagu</p>
+          <p id="kpi-total" class="kpi-value text-spotify-green">100</p>
+        </div>
+        <!-- Avg Danceability -->
+        <div class="kpi-card">
+          <p class="kpi-label">Avg Danceability</p>
+          <p id="kpi-dance" class="kpi-value">—</p>
+        </div>
+        <!-- Avg Energy -->
+        <div class="kpi-card">
+          <p class="kpi-label">Avg Energy</p>
+          <p id="kpi-energy" class="kpi-value">—</p>
+        </div>
+        <!-- Avg Tempo -->
+        <div class="kpi-card">
+          <p class="kpi-label">Avg Tempo (BPM)</p>
+          <p id="kpi-tempo" class="kpi-value">—</p>
+        </div>
+        <!-- Avg Duration -->
+        <div class="kpi-card">
+          <p class="kpi-label">Avg Durasi (menit)</p>
+          <p id="kpi-duration" class="kpi-value">—</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ROW 1: Top Artists + Scatter ===== -->
+    <section aria-label="Top Artists and Scatter Plot" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- Top 10 Artists Bar Chart -->
+      <div class="chart-card">
+        <h3 class="chart-title">Top 10 Artis dengan Lagu Terbanyak</h3>
+        <div class="chart-wrap">
+          <canvas id="chart-top-artists" aria-label="Top 10 artis"></canvas>
+        </div>
+      </div>
+
+      <!-- Danceability vs Energy Scatter -->
+      <div class="chart-card">
+        <h3 class="chart-title">Danceability vs Energy</h3>
+        <div class="chart-wrap">
+          <canvas id="chart-scatter" aria-label="Scatter danceability vs energy"></canvas>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ===== ROW 2: Doughnut + Radar ===== -->
+    <section aria-label="Key Mode Distribution and Audio Features" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- Key & Mode Doughnut -->
+      <div class="chart-card">
+        <h3 class="chart-title">Distribusi Key &amp; Mode</h3>
+        <div class="chart-wrap chart-wrap--sm">
+          <canvas id="chart-key-mode" aria-label="Distribusi key dan mode"></canvas>
+        </div>
+      </div>
+
+      <!-- Radar: Average Audio Features -->
+      <div class="chart-card">
+        <h3 class="chart-title">Rata-rata Fitur Audio</h3>
+        <div class="chart-wrap chart-wrap--sm">
+          <canvas id="chart-radar" aria-label="Radar fitur audio"></canvas>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ===== ROW 3: Histogram + Horizontal Bar ===== -->
+    <section aria-label="Tempo Distribution and Longest Songs" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- Tempo Histogram -->
+      <div class="chart-card">
+        <h3 class="chart-title">Distribusi Tempo (Histogram)</h3>
+        <div class="chart-wrap">
+          <canvas id="chart-tempo-hist" aria-label="Distribusi tempo"></canvas>
+        </div>
+      </div>
+
+      <!-- Top 10 Longest Songs Horizontal Bar -->
+      <div class="chart-card">
+        <h3 class="chart-title">Top 10 Lagu Terlama</h3>
+        <div class="chart-wrap">
+          <canvas id="chart-longest" aria-label="Top 10 lagu terlama"></canvas>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="text-center text-xs text-spotify-muted py-6 mt-4 border-t border-white/10">
+    Data: Spotify Top 100 Tracks of 2018 &bull; Visualisasi menggunakan Chart.js &bull; Dibangun dengan HTML, Tailwind CSS &amp; Vanilla JS
+  </footer>
+
+  <!-- Main Script -->
+  <script src="script.js"></script>
+</body>
+</html>
